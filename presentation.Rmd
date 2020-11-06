@@ -1,0 +1,135 @@
+---
+title: "DDP WEEK4"
+author: "Grissel"
+date: "11/6/2020"
+
+---
+
+## Developing Data wek 4 assignment
+
+This is the presentation for the final week that is week 4 of developing data products coursera subject.
+This involves server.R and UI.R file. it is a user interface program. This preentation is part of the coursework.
+The link is https://grissel-99.shinyapps.io/ddpweek4/. The code can be found at https://github.com/Grissel-99/developing_data
+The above links provided contains all the necessary file for this project.
+It links are for my github and shinyapps account.
+This is oneof the last courses in the data science coursera.
+the csv files used here is related to cars comprising many columns and rows.
+
+
+# View
+
+plotting graph for different hp values
+
+```{r }
+cars <- read.csv('auto-mpg.csv')
+head(cars)
+```
+
+## code for UI
+
+```{r echo=TRUE, warning=FALSE, message=FALSE, eval=FALSE}
+library(shiny)
+
+shinyUI(
+  navbarPage("Analysis of technical specifications",
+             tabPanel("Analysis",
+                      fluidPage(
+                        titlePanel("factors and acc relation"),
+                        sidebarLayout(
+                          sidebarPanel(
+                            selectInput("variable", "Var:",
+                                        c("MPG" = "mpg",
+                                          "Number of cylinders" = "cyl",
+                                          "Displacement (cu.in.)" = "disp",
+                                          "Weight (lb/1000)" = "w",
+                                          "acceleration (sec)" = "acc"
+                                        ))
+                          ),
+                          
+                          mainPanel(
+                            h3(textOutput("caption")),
+                            
+                            tabsetPanel(type = "tabs", 
+                                        tabPanel("Plot", plotOutput("cBP"))
+                            )
+                          )
+                        )
+                      )
+             ),
+             tabPanel("About the Data Set",
+                      
+                      h3("Kaggle autompg-data"),
+                      helpText("'Auto-MPG' is used datasetto understand how wt, hpand no. of cyl affects the acc of car.",
+                               "dataset contains the specifications vehicles. UCI Machine Learning Repository is where the",
+                               "dataset related to the car specification is downloaded."),
+                      
+                      h3("Important"),
+                      p("this dataframe contains 398 observations. these onservations are on 6 vars."),
+                      
+                      a(" https://archive.ics.uci.edu/ml/datasets/auto+mpg")
+             ),
+             tabPanel("More detail on the data",
+                      h2("Auto-mpg dataset"),
+                      hr(),
+                      h3("Description"),
+                      helpText("The data is technical spec of cars.",
+                               "UCI Machine Learning Repository is where this dataset is downloaded from"),
+                      
+                      h3("Format"),
+                      p("this dataframe contains 398 observations. these onservations are on 6 vars."),
+                      
+                      p("  [, 1]   mpg         Miles/(US) gallon"),
+                      p("  [, 2]	 cylinder	 Number of cylinders"),
+                      p("  [, 3]	 displacement	 Displacement (cu.in.)"),
+                      p("  [, 4]	 horsepower	 Gross horsepower"),
+                      p("  [, 5]	 weight	 Weight(lbs)"),
+                      p("  [, 6]   acceleration acceleration(sec)"),
+                      h3("Source"),
+                      
+                      p("This dataset was taken from the StatLib library.",
+                        
+                        "this library is used in 1983.",
+                        "The purpose was to use it in American Statistical Association Exposition.")
+             ),
+             tabPanel("my github reposiory:",
+                      a("https://github.com/Grissel-99/developing_data/tree/main"),
+                      hr(),
+                    
+                      h4("Developing Data is the name of the repo")
+             )
+  )
+)
+```
+
+
+## code for server
+
+```{r echo=TRUE, warning=FALSE, message=FALSE, eval=FALSE}
+
+library(shiny)
+
+c <- read.csv('auto-mpg.csv')
+
+shinyServer(function(input,output)
+{
+  formulaText <- reactive({
+    paste("horsepower ~ ",input$variable)
+  })
+  
+  formulaTextPoint <- reactive({
+    paste("horsepower ~", "as.integer(",input$variable,")")
+  })
+  
+  
+  output$ca <- renderText({
+    formulaText()
+  })
+  
+  output$cBP <-renderPlot({
+    plot(as.formula(formulaText()),data = c, outline = input$outliers)
+  })
+  
+  
+})
+```
+
